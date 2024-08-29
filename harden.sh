@@ -50,5 +50,12 @@ sysctl -p
 apt-get install auditd -y
 auditctl -e 1
 
+# Configure file system hardening
+echo "tmpfs /tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
+echo "tmpfs /var/tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
+echo "tmpfs /var/log tmpfs defaults,noexec,nosuid,nodev,size=100M 0 0" >> /etc/fstab
+echo "tmpfs /var/log/audit tmpfs defaults,noexec,nosuid,nodev,size=100M 0 0" >> /etc/fstab
+echo "tmpfs /home/tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
+
 # Restart the system to apply changes
 reboot
