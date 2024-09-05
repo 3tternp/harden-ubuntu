@@ -11,10 +11,33 @@ ufw default deny incoming
 ufw default allow outgoing
 ufw allow ssh
 
-# Configure secure SSH
-sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
-sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-systemctl restart sshd
+# Function to prompt user for yes/no input
+ask_yes_no() {
+    while true; do
+        read -p "$1 (yes/no): " choice
+        case "$choice" in
+            yes|y|Y ) return 0;;  # Yes: execute the command
+            no|n|N ) return 1;;    # No: skip the command
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+}
+
+# Ask user if they want to configure secure SSH
+if ask_yes_no "Do you want to configure secure SSH settings (Disable root login and password authentication)?"; then
+    echo "Configuring secure SSH settings..."
+    
+    # Configure secure SSH settings
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    
+    # Restart SSH service to apply changes
+    systemctl restart sshd
+    
+    echo "SSH settings updated: Root login and password authentication are disabled."
+else
+    echo "Skipping SSH configuration."
+fi
 
 # Configure password policies
 sed -i 's/PASS_MAX_DAYS\s+99999/PASS_MAX_DAYS 90/' /etc/login.defs
