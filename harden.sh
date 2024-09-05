@@ -57,5 +57,37 @@ echo "tmpfs /var/log tmpfs defaults,noexec,nosuid,nodev,size=100M 0 0" >> /etc/f
 echo "tmpfs /var/log/audit tmpfs defaults,noexec,nosuid,nodev,size=100M 0 0" >> /etc/fstab
 echo "tmpfs /home/tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
 
+# Step 1: Ensure AppArmor is installed and enabled
+echo "Installing AppArmor..."
+apt update
+apt install -y apparmor apparmor-utils auditd
+
+# Step 2: Enable AppArmor to start at boot
+echo "Enabling AppArmor..."
+systemctl enable apparmor
+systemctl start apparmor
+
+# Step 3: Enforce AppArmor profiles
+echo "Setting AppArmor profiles to enforce mode..."
+aa-enforce /etc/apparmor.d/*
+
+# Step 4: Apply additional hardening
+echo "Applying CIS-based hardening..."
+
+# Ensure Auditd service is running (for AppArmor logging)
+echo "Ensuring Auditd is running..."
+systemctl enable auditd
+systemctl start auditd
+
+# Set kernel parameter for hardening
+echo "Setting kernel parameters for hardening..."
+sysctl -w kernel.dmesg_restrict=1
+sysctl -w kernel.kptr_restrict=2
+
+# Save parameters to apply after reboot
+cat >> /etc/sysctl.conf <<EOF
+kernel.dmesg_restrict=1
+kernel.kptr_restrict=2
+
 # Restart the system to apply changes
 reboot
