@@ -1,15 +1,22 @@
 #!/bin/bash
 
 # Update the system
-apt-get update
-apt-get upgrade -y
+sudo apt-get update
+sudo apt-get upgrade -y
 
 # Install and configure firewall (ufw)
-apt-get install ufw -y
+sudo apt-get install ufw -y
 ufw enable
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow ssh
+
+#installing AIDE 
+echo "Installing AIDE..."
+sudo apt-get install -y aide
+
+echo "Initializing AIDE database. This may take some time..."
+sudo aideinit
 
 # Function to prompt user for yes/no input
 ask_yes_no() {
@@ -45,10 +52,10 @@ sed -i 's/PASS_MIN_DAYS\s+0/PASS_MIN_DAYS 7/' /etc/login.defs
 sed -i 's/PASS_WARN_AGE\s+7/PASS_WARN_AGE 14/' /etc/login.defs
 
 # Install and configure fail2ban
-apt-get install fail2ban -y
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-sed -i 's/bantime\s*=\s*600/bantime = 3600/' /etc/fail2ban/jail.local
-systemctl restart fail2ban
+sudo apt-get install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo sed -i 's/bantime\s*=\s*600/bantime = 3600/' /etc/fail2ban/jail.local
+sudo systemctl restart fail2ban
 
 # Disable unused services
 systemctl disable avahi-daemon
@@ -82,8 +89,8 @@ echo "tmpfs /home/tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
 
 # Step 1: Ensure AppArmor is installed and enabled
 echo "Installing AppArmor..."
-apt update
-apt install -y apparmor apparmor-utils auditd
+sudo apt update
+sudo apt install -y apparmor apparmor-utils auditd
 
 # Step 2: Enable AppArmor to start at boot
 echo "Enabling AppArmor..."
@@ -111,6 +118,7 @@ sysctl -w kernel.kptr_restrict=2
 cat >> /etc/sysctl.conf <<EOF
 kernel.dmesg_restrict=1
 kernel.kptr_restrict=2
+
 
 # Restart the system to apply changes
 reboot
