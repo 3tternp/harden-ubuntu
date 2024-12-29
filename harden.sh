@@ -16,7 +16,7 @@ echo "Installing AIDE..."
 sudo apt-get install -y aide
 
 echo "Initializing AIDE database. This may take some time..."
-sudo aideinit
+sudo aide init
 
 # Function to prompt user for yes/no input
 ask_yes_no() {
