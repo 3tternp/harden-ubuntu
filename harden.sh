@@ -77,8 +77,8 @@ echo "kernel.unprivileged_bpf_disabled = 1" >> /etc/sysctl.conf
 sysctl -p
 
 # Install and configure auditd
-apt-get install auditd -y
-auditctl -e 1
+sudo apt-get install auditd -y
+sudo auditctl -e 1
 
 # Configure file system hardening
 echo "tmpfs /tmp tmpfs defaults,noexec,nosuid,nodev 0 0" >> /etc/fstab
